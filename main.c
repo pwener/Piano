@@ -13,6 +13,12 @@
 #define PIN_2 BIT2
 #define PIN_3 BIT3
 
+#define BTN BIT3
+
+#define LIMIT 8
+
+unsigned int timer_count = 0;
+
 int bcd[] = {
 		PIN_G,
 		~(PIN_B | PIN_C),
@@ -26,10 +32,11 @@ int bcd[] = {
 		PIN_D | PIN_E
 };
 
-void
-main(void)
-{
+void main(void) {
 	WDTCTL = WDTPW + WDTHOLD;
+	P1IE |= BTN; // P1.3 interrupt enabled
+  P1IFG &= ~BTN; // P1.3 IFG cleared
+  P1REN |= BTN; // Enable resistor on BTN
 
 	P1DIR |= (PIN_A | PIN_B | PIN_C | PIN_D | PIN_E | PIN_F | PIN_G);
 	P1OUT = 0;
@@ -38,8 +45,25 @@ main(void)
 	P2DIR |= (PIN_0 | PIN_1 | PIN_2 | PIN_3);
 	P2OUT = 0;
 
-	for (;;) {
-	}
+	TACTL = TASSEL_2 + MC_2; // configure Timer A
+	_BIS_SR(LPM4_bits+GIE);
+
+__enable_interrupt(); // enable all interrupts
+
+	while(1);
 
 	return 0;
+}
+
+/*
+ * Syntax of interruptions used in code composer
+ */
+#pragma vector=PORT1_VECTOR
+__interrupt void Port_1(void) {
+	timer_count = (TAR % LIMIT); // found a value between 0 to LIMIT
+	/*
+	 * According documentation, if this flags are not setted to 0,
+	 * the interrupts stay peding.
+	 */
+ 	P1IFG &= ~BTN; // P1.3 IFG cleared
 }
