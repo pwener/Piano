@@ -15,9 +15,9 @@
 #define CMajor_NOTE 522
 
 // Quantity of notes
-#define LIMIT 8
+#define LIMIT 7
 
-const static int notes[LIMIT] = {C_NOTE, D_NOTE, E_NOTE, F_NOTE, G_NOTE, A_NOTE, B_NOTE, CMajor_NOTE};
+const static int notes[LIMIT] = {C_NOTE, D_NOTE, E_NOTE, F_NOTE, G_NOTE, A_NOTE, B_NOTE};
 
 void beep(unsigned int note, unsigned int duration);
 

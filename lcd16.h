@@ -10,7 +10,7 @@
  *	VO - GND
  *	RS - P1.7
  *	RW - GND
- *	RE - P1.6
+ *	E - P1.6
  *	D4 - P1.0
  *	D5 - P1.1
  *	D6 - P1.2

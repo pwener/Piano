@@ -24,12 +24,36 @@ void delay_us(unsigned int us ) {
  * Enable BTN(P1.3)
  */
 void enable_btn() {
-	P1DIR &= ~BTN;
-	P1OUT |= BTN;
-	P1IE |= BTN; // P1.3 interrupt enabled
-	P1IES |= BTN; // P1.3 Hi/lo edge
-	P1IFG &= ~BTN; // P1.3 IFG cleared
-	P1REN |= BTN; // Enable resistor on BTN
+	P2DIR &= ~(BIT0 | BIT1 | BIT2);
+	P2IE |= (BIT0 | BIT1 | BIT2); // P2.x interrupt enabled
+	P2IFG &= ~(BIT0 | BIT1 | BIT2); // P2.x IFG cleared
+	P2IES &= ~(BIT0 | BIT1 | BIT2); // P1.3 Hi/lo edge
+}
+
+/**
+ * Convert btn coded with binary to decimal value
+ */
+int note_played() {
+	int note = 0;
+	int bit_set[3] = {0, 0, 0};
+	int x = 600;
+	while(x) {
+		if ((BIT0 & P2IN) && (bit_set[0] == 0)) {
+			note+=1;
+			bit_set[0] = 1;
+		}
+		if ((BIT1 & P2IN) && (bit_set[1] == 0)) {
+			note+=2;
+			bit_set[1] = 1;
+		}
+		if ((BIT2 & P2IN) && (bit_set[2] == 0)) {
+			note+=4;
+			bit_set[2] = 1;
+		}
+		x--;
+	}
+
+	return note-1;
 }
 
 void configure_timer_a() {

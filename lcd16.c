@@ -43,6 +43,24 @@ void lcdData(unsigned char l) {
 	P1OUT &= ~EN;
 }
 
+void lcd_reset() {
+	P1DIR = 0xff;	// output mode
+	P1OUT = 0xff;
+	__delay_cycles(20000);
+	P1OUT = 0x03+EN;
+	P1OUT = 0x03;
+	__delay_cycles(10000);
+	P1OUT = 0x03+EN;
+	P1OUT = 0x03;
+	__delay_cycles(1000);
+	P1OUT = 0x03+EN;
+	P1OUT = 0x03;
+	__delay_cycles(1000);
+	P1OUT = 0x02+EN;
+	P1OUT = 0x02;
+	__delay_cycles(1000);
+}
+
 /**
  * This function uses P1DIR and P1OUT
  */
@@ -50,6 +68,10 @@ void enable_lcd_write(void) {
 	// should set P1DIR and P1OUT
 	P1DIR = 0xFF;
 	P1OUT = 0x00;
+	// clean p1 inputs
+	P1IE = 0; // P1.3 interrupt enabled
+	P1IES = 0; // P1.3 Hi/lo edge
+	P1REN = 0; // Enable resistor on BTN
 
 	P1OUT &= ~RS;
 	P1OUT &= ~EN;
