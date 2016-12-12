@@ -5,6 +5,7 @@
 
 #define BTN BIT3
 
+void update_score(void);
 void delay_ms(unsigned int ms );
 void delay_us(unsigned int us );
 void enable_btn(void);

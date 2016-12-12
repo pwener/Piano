@@ -3,54 +3,37 @@
 #include "util.h"
 #include "music.h"
 
-// P2 pins
-#define PIN_0 BIT0
-#define PIN_1 BIT1
-#define PIN_2 BIT2
-#define PIN_3 BIT3
-
-unsigned int sorted_note = 0;
-unsigned int score = 0;
-unsigned int errors = 0;
-unsigned int is_running = 0;
-
-void update_score() {
-	enable_lcd_write();
-
-	// prints a unique line
-	gotoXy(0,0);
-	prints("Score:");
-	integerToLcd(score);
-	gotoXy(0,1);
-	prints("Erros:");
-	integerToLcd(errors);
-}
+unsigned int sorted_note = 0;  // note sorted between 0, 6
+unsigned int score = 0; // points scored
+unsigned int errors = 0; // errors scored
+unsigned int is_running = 0; // if game is running, change to 1
 
 void main(void) {
 	WDTCTL = WDTPW + WDTHOLD; // disable WDT
 
 	enable_lcd_write();
-	prints("Vamos começar?");
-	gotoXy(0,1);
+	prints("Vamos comeÃ§ar?");
+	gotoXy(0,1); // go to second line
 	prints("  tecle algo!");
 
-	enable_btn();
+	enable_btn(); // now P2.x is able to catch an interruption
 
 	configure_timer_a();
 
-	__enable_interrupt(); // enable all interrupts
+	__enable_interrupt(); // enable all interrupts, if we need others
 }
 
 /*
- * Syntax of interruptions used in code composer
+ * Syntax of interruptions used into code composer.
+ * The logic in follow runs the game after each p2.x click.
  */
 #pragma vector=PORT2_VECTOR
 __interrupt void Port_2(void) {
 	int note = note_played();
 
 	if(!is_running) {
-		is_running = 1;
 		// game initiate
+		is_running = 1;
 	} else {
 		if(note == sorted_note) {
 			score++;
@@ -61,11 +44,12 @@ __interrupt void Port_2(void) {
 
 	sorted_note = (TAR % LIMIT); // found a value between 0 to LIMIT
 
-	beep(notes[sorted_note], 500); // play an random note
+	beep(notes[sorted_note], 500); // play the random note
 
-	update_score();
+	update_score(); // update display score
 
-	enable_btn();
+	enable_btn(); // wait again the interruptions
+
  	/*
  	 * Above instructions should be runned after any logic
 	 * According documentation, if this flags are not setted to 0,

@@ -1,6 +1,19 @@
 #include "util.h"
 
 /*
+ * Update score into LCD
+ */
+void update_score() {
+	enable_lcd_write();
+	gotoXy(0,0);
+	prints("Score:");
+	integerToLcd(score);
+	gotoXy(0,1);
+	prints("Erros:");
+	integerToLcd(errors);
+}
+
+/*
  * This two functions stop the main thread for a certain number of milli (10^-3).
  */
 void delay_ms(unsigned int ms ) {
@@ -56,6 +69,9 @@ int note_played() {
 	return note-1;
 }
 
+/**
+ * Lower power mode is set with 0 to SMLK and ACLK stay working
+ */
 void configure_timer_a() {
 	BCSCTL1 = CALBC1_1MHZ; // configure time A source clk
 	DCOCTL = CALDCO_1MHZ; // configure digital oscilator clk
@@ -63,5 +79,5 @@ void configure_timer_a() {
 	TACTL = TASSEL_2 + MC_3 + ID_3; // configure Timer A
 	TACCR0 = 8; // count until LIMIT
 
-	_BIS_SR(LPM4_bits+GIE);
+	_BIS_SR(LPM0_bits+GIE); // activate Lower Power mode and interruptions
 }
